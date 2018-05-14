@@ -2,7 +2,7 @@ package com.akkademy
 
 import akka.actor.{Actor, Status}
 import akka.event.Logging
-import com.akkademy.message.{GetRequest, KeyNotFoundException, SetRequest}
+import com.akkademy.message._
 
 import scala.collection.mutable
 
@@ -18,9 +18,29 @@ class AkkademyDB extends Actor{
     }
     case GetRequest(key) =>{
       log.info("Received GetRequest - key {}",key)
-      val respons :Option[Object] = map.get(key)
-      respons match {
+      val response :Option[Object] = map.get(key)
+      response match {
         case Some(x) => sender() ! x
+        case None    => sender() ! Status.Failure(new KeyNotFoundException(key))
+      }
+    }
+    case SetIfNotExistsRequest(key,value) =>{
+      val response :Option[Object] = map.get(key)
+      response match {
+        case Some(x) => sender() ! x
+        case None    => {
+          map.put(key,value)
+          sender() ! value
+        }
+      }
+    }
+    case Delete(key) =>{
+      val response :Option[Object] = map.get(key)
+      response match {
+        case Some(x) => {
+          map.remove(key)
+          sender() ! x
+        }
         case None    => sender() ! Status.Failure(new KeyNotFoundException(key))
       }
     }

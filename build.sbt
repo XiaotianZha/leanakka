@@ -1,6 +1,6 @@
 name := "leanakka"
 
-version := "0.1-SNAPSHOT"
+version := "0.2-SNAPSHOT"
 organization :="com.akkademy-db"
 
 scalaVersion := "2.12.2"
